@@ -27,7 +27,7 @@ public class ExcelUtil {
      *
      * */
     public static List<String[][]> readExcelFile(String excelPath){
-        // result of add sheets of excel file
+        // result of iterating over sheets of excel file
         List<String[][]> list = new ArrayList<String[][]>();
         try {
             Workbook wb = WorkbookFactory.create(new File(excelPath));
