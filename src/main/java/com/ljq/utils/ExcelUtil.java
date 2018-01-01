@@ -3,7 +3,8 @@ package com.ljq.utils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -18,19 +19,36 @@ import java.util.List;
 public class ExcelUtil {
 
     // value "true" for DEBUG
-    private static final boolean DBG = true;
+    private static final boolean DBG = false;
 
     /**
-     * itertor over local excel file(include .xls and .xlsx)
+     * iterator over local excel file(include .xls and .xlsx)
      * @param excelPath local excel file path
-     * @reruen list result of itetroing
      *
+     * @reruen list result of itetroing
      * */
     public static List<String[][]> readExcelFile(String excelPath){
+        try {
+            FileInputStream inputStream = new FileInputStream(excelPath);
+            return readExcelFile(inputStream);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    /**
+     * iterator over Excel file from stream
+     * @param inputStream Excel file stream
+     *
+     * @return list result of itetroing
+     * */
+    public static List<String[][]> readExcelFile(FileInputStream inputStream){
         // result of iterating over sheets of excel file
         List<String[][]> list = new ArrayList<String[][]>();
         try {
-            Workbook wb = WorkbookFactory.create(new File(excelPath));
+            Workbook wb = WorkbookFactory.create(inputStream);
             // iterating over the excel file
             for (Sheet sheet : wb) {
                 // Decide which rows to process
@@ -65,15 +83,22 @@ public class ExcelUtil {
                 }
                 if(DBG){System.out.println("----- cut-off line ------"); }
             }
+            return list;
         } catch (IOException e) {
             e.printStackTrace();
-    } catch (InvalidFormatException e) {
+        } catch (InvalidFormatException e) {
             e.printStackTrace();
-    }
-        return list;
+        }
+        return null;
 
     }
 
+    /**
+     *  get String value of Excel cell
+     *  @param cell Excel cell
+     *
+     *  @return string
+     * */
     private static String getCellValue(Cell cell){
         if (cell == null) {
             if(DBG){System.out.println("this cell is empty");}

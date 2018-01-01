@@ -28,6 +28,7 @@ public class ExcelUtilTest {
                     }
                     System.out.println();
                 }
+                System.out.println("------ cut-off line ------");
             }
         }
 
