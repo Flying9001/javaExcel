@@ -31,6 +31,7 @@
 
   <dependencies>
 
+    <!-- poi is for Microsoft Excel 97 (-2003),poi-ooxml is Microsoft Excel XML (2007+)-->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
