@@ -6,11 +6,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExcelUtilTest {
+
+
+    @Test
+    public void writeExcelFile() throws Exception {
+
+        String outExcelPath = "src\\resources\\out\\outExcel-1.xlsaaaa";
+        ExcelUtil.writeExcelFile(null,null,outExcelPath);
+
+
+    }
+
     @Test
     public void readExcelFile() throws Exception {
 
-        String excelPath1 = "D:\\develop\\repository\\git\\javaExcel\\src\\resources\\excel\\demo-1.xlsx";
-        String excelPath2 = "D:\\develop\\repository\\git\\javaExcel\\src\\resources\\excel\\demo-2.xls";
+        String excelPath1 = "src\\resources\\excel\\demo-1.xlsx";
+        String excelPath2 = "src\\resources\\excel\\demo-2.xls";
 
         List<String[][]> list = new ArrayList<String[][]>();
         list = ExcelUtil.readExcelFile(excelPath1);
