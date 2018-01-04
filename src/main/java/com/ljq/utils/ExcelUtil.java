@@ -1,11 +1,11 @@
 package com.ljq.utils;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,51 +58,75 @@ public class ExcelUtil {
     }
 
     /**
-     * write Excel file(.xls and xlsx)
+     * create local Excel file(.xls or .xlsx based on the @param outExcelPath)
      * checkout the path of exported Excel file
+     * the Excel file path must be an the only valid ,it can't be null,or a directory,or an exist file,
+     * and it must be ended with ".xls" or ".xlsx"
      * @param cellList  value list of Excel cells
-     * @param sheetNameList names of Excel sheets
-     * @param outExcelPath path of output Excel
+     * @param sheetNameList names of Excel sheets,if null,names sheet by default
+     * @param outExcelPath path of exported Excel file
      *
-     * return boolean weather success writing Excel file to local
+     * @return boolean weather success writing Excel file to local
      *
      * */
     public static boolean writeExcelFile(List<String[][]> cellList,List<String> sheetNameList, String outExcelPath){
         Workbook workbook = null;
-        if(outExcelPath != null && !outExcelPath.equals("")){
-            File outExcelFile = new File(outExcelPath);
-            if(!outExcelFile.isDirectory()){
-                if(outExcelFile.isFile()){
-                    if(DBG){ System.out.println("outExcelPath: " + outExcelPath); }
-
-                    return true;
+        String checkPath = FileUtil.checkFilePath(outExcelPath);
+        if(checkPath != null && "notFileOrDir".equals(checkPath)){
+            if(outExcelPath.toLowerCase().endsWith(".xls")){
+                workbook = new HSSFWorkbook();
+            }else{
+                if(outExcelPath.toLowerCase().endsWith(".xlsx")){
+                    workbook = new XSSFWorkbook();
+                }else{
+                    if(DBG){ System.out.println("invalid Excel file name,should be ended with .xls/.xlsx"); }
+                    return false;
                 }
-                if(DBG){ System.out.println("outExcelPath: " + outExcelPath + " is not a file.."); }
+            }
+            if(cellList != null && !cellList.isEmpty() && cellList.size() > 0){
+                Sheet sheet = null;
+                for (int i = 0; i < cellList.size(); i++) {
+                    if(sheetNameList != null && !sheetNameList.isEmpty() && sheetNameList.size() == cellList.size()){
+                        // name sheets by sheetNameList
+                        sheet = workbook.createSheet(sheetNameList.get(i).toString());
+                    }else{
+                        // name sheets by default
+                        sheet = workbook.createSheet("Sheet" + (i + 1));
+                    }
+                    Row row = null;
+                    // create sheets
+                    for (int j = 0; j < cellList.get(i).length; j++) {
+                        row = sheet.createRow(j);
+                        // create cells
+                        for (int k = 0; k < cellList.get(i)[j].length; k++) {
+                            row.createCell(k).setCellValue(cellList.get(i)[j][k]);
+                        }
+                    }
+                }
+                try {
+                    // write Excel data to file
+                    FileOutputStream outExcelFile = new FileOutputStream(outExcelPath);
+                    workbook.write(outExcelFile);
+                    outExcelFile.close();
+                    return true;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 return false;
             }
-            if(DBG){ System.out.println("outExcelPath: " + outExcelPath + " is a directory."); }
+            if(DBG) { System.out.println("cellList is empty or cellList.size()=0"); }
             return false;
         }
         return false;
     }
-
-
-
-
-
-
-
-
-
-
-
 
     /**
      * iterator over sheets from Excel file
      * @param workbook Excel file,contains .xls and .xlsx
      *
      * @return list result of iterating
-     *
      * */
     private static List<String[][]> iteratorWorkBook(Workbook workbook){
         if(workbook == null){
@@ -144,11 +168,8 @@ public class ExcelUtil {
                 }
                 if(DBG){System.out.println("----- cut-off line ------"); }
             }
+            return list;
         }
-
-
-
-        return null;
     }
 
     /**

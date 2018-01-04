@@ -14,7 +14,7 @@ public class FileUtil {
      * check out file path and return the type of File
      * @param filePath path of file
      *
-     * return stirng type of File
+     * return stirng type of File,like "file","directory","notFileOrDir"
      * */
     public static String checkFilePath(String filePath){
 
@@ -26,7 +26,7 @@ public class FileUtil {
                 if(file.isFile()){
                     return "file";
                 }
-                return "notFileAndDirectory";
+                return "notFileOrDir";
             }
         }
         return null;
